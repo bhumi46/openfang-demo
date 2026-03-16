@@ -1,0 +1,58 @@
+[hand]
+name        = "django-minion"
+version     = "1.0.0"
+description = """
+Stripe-style unattended coding agent for Python Django projects.
+Monitors your repo for failing tests, linting errors, and open issues.
+Writes fixes, runs tests, opens GitHub PRs autonomously.
+No human interaction between trigger and pull request.
+"""
+author      = "your-team"
+
+[schedule]
+cron        = "0 */3 * * *"    # every 3 hours
+timezone    = "Asia/Kolkata"
+max_runtime = "20m"            # hard kill after 20 minutes
+
+[tools]
+allowed = [
+  "bash",         # run git, pytest, flake8, black, django manage.py
+  "file_read",    # read Python files, settings, models
+  "file_write",   # write fixed files
+  "web_fetch",    # call GitHub REST API
+  "web_search",   # look up error messages, Django docs
+]
+
+[settings]
+github_repo    = { type = "string", required = true,
+                   description = "GitHub repo e.g. org/django-app" }
+github_token   = { type = "secret", required = true,
+                   description = "Personal access token with repo scope" }
+slack_channel  = { type = "string", default = "#django-alerts" }
+django_app     = { type = "string", default = "myapp",
+                   description = "Name of your Django app directory" }
+branch_prefix  = { type = "string", default = "minion/" }
+max_ci_retries = { type = "integer", default = 2 }
+python_version = { type = "string", default = "3.11" }
+
+[guardrails]
+require_approval   = ["git push --force", "DROP TABLE", "DELETE FROM"]
+max_files_changed  = 8
+max_pr_per_run     = 3
+never_touch        = [
+  "settings/production.py",
+  ".env",
+  "migrations/",
+  "secrets.py",
+]
+
+[output]
+dashboard = true
+channels  = ["slack"]
+
+[metrics]
+prs_opened      = "counter"
+tests_fixed     = "counter"
+lint_fixed      = "counter"
+escalations     = "counter"
+ci_pass_rate    = "percentage"
