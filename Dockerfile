@@ -1,7 +1,7 @@
-FROM ubuntu:18.04
+FROM --platform=linux/amd64 ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y curl git ca-certificates libssl1.0.0 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl git ca-certificates libssl3 && rm -rf /var/lib/apt/lists/*
 
 # Install OpenFang
 RUN curl -fsSL https://openfang.sh/install | sh

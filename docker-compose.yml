@@ -1,5 +1,6 @@
 services:
   openfang:
+    platform: linux/amd64
     build: .
     container_name: openfang
     environment:
