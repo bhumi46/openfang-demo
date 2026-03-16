@@ -12,6 +12,7 @@ services:
     volumes:
       - openfang-data:/root/.openfang
       - ./django-minion:/workspace/django-minion
+      - ./test-django-app:/workspace/test-django-app
     stdin_open: true
     tty: true
     entrypoint: /bin/bash
