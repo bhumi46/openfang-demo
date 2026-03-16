@@ -1,33 +1,18 @@
-FROM python:3.11-slim
+FROM ubuntu:18.04
 
-WORKDIR /openfang
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y curl git ca-certificates libssl1.0.0 && rm -rf /var/lib/apt/lists/*
 
-# Install system deps
-RUN apt-get update && apt-get install -y git curl && rm -rf /var/lib/apt/lists/*
+# Install OpenFang
+RUN curl -fsSL https://openfang.sh/install | sh
 
-# Install Python deps globally (no venv needed inside container)
-RUN pip install --no-cache-dir \
-    groq \
-    requests \
-    django>=4.2 \
-    pytest \
-    pytest-django \
-    flake8 \
-    black \
-    isort
+# Make openfang available on PATH
+ENV PATH="/root/.openfang/bin:${PATH}"
 
-# Copy project files
+WORKDIR /workspace
+
 COPY django-minion/ ./django-minion/
-COPY test-django-app/ ./test-django-app/
-COPY runner/ ./runner/
 
-# Configure git identity for the agent to commit
-RUN git config --global user.email "django-minion@openfang.local" && \
-    git config --global user.name "django-minion"
+EXPOSE 4200
 
-# Init the test app as a git repo so the agent can branch + commit
-RUN cd test-django-app && git init && git add . && git commit -m "Initial buggy state"
-
-WORKDIR /openfang
-
-CMD ["python", "runner/run.py"]
+CMD ["openfang", "start"]

@@ -1,12 +1,19 @@
 services:
-  django-minion:
+  openfang:
     build: .
-    container_name: openfang-django-minion
+    container_name: openfang
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_REPO=${GITHUB_REPO:-bhumi46/openfang-demo}
+    ports:
+      - "4200:4200"
     volumes:
-      # Only mount hand config so edits reflect live; test-django-app stays inside container
-      - ./django-minion:/openfang/django-minion
+      - openfang-data:/root/.openfang
+      - ./django-minion:/workspace/django-minion
     stdin_open: true
     tty: true
+    entrypoint: /bin/bash
+
+volumes:
+  openfang-data:
