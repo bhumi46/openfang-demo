@@ -1,0 +1,12 @@
+services:
+  django-minion:
+    build: .
+    container_name: openfang-django-minion
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      # Only mount hand config so edits reflect live; test-django-app stays inside container
+      - ./django-minion:/openfang/django-minion
+    stdin_open: true
+    tty: true
